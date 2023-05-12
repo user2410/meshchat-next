@@ -1,11 +1,14 @@
 "use client";
 
+import axios from "axios";
 import React, { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import Input from "./inputs/Input";
 import Button from "./Button";
 import { BsGithub, BsGoogle } from "react-icons/bs";
 import AuthSocialButton from "./AuthSocialButton";
+import { toast } from "react-hot-toast";
+import { signIn } from "next-auth/react";
 
 type Variant = "LOGIN" | "REGISTER";
 
@@ -33,21 +36,47 @@ export default function AuthForm() {
 		},
 	});
 
-	const onSubmit: SubmitHandler<FieldValues> = (data) => {
+	const onSubmit: SubmitHandler<FieldValues> = async (data) => {
 		setLoading(true);
-		if (variant === "REGISTER") {
-			// Axios register
-		}
 
-		if (variant === "LOGIN") {
-			// NextAuth Signin
+		try {
+			if (variant === "REGISTER") {
+				await axios.post("/api/register", data);
+			} else {
+				const cb = await signIn("credentials", {
+					...data,
+					redirect: false,
+				});
+				if (cb?.error) {
+					toast.error("Invalid credential");
+				} else if (cb?.ok) {
+					toast.success(`Logged in as ${data?.email}!`);
+				}
+			}
+		} catch (err) {
+			toast.error("something went wrong");
+			console.error(err);
+		} finally {
+			setLoading(false);
 		}
 	};
 
 	const socialAction = (action: string) => {
 		setLoading(true);
 
-		// NextAuth Social Signin
+		signIn(action, { redirect: false })
+			.then((cb) => {
+				if (cb?.error) {
+					toast.error("Invalid credential");
+				} else if (cb?.ok) {
+					toast.success(`Logged in as ${cb.url}!`);
+				}
+			})
+			.catch((err) => {
+				toast.error("something went wrong");
+				console.error(err);
+			})
+			.finally(() => setLoading(false));
 	};
 
 	return (
@@ -61,6 +90,7 @@ export default function AuthForm() {
 							register={register}
 							errors={errors}
 							disabled={isLoading}
+							required
 						/>
 					)}
 					<Input
@@ -69,6 +99,8 @@ export default function AuthForm() {
 						register={register}
 						errors={errors}
 						disabled={isLoading}
+						type="email"
+						required
 					/>
 					<Input
 						id="password"
@@ -76,6 +108,8 @@ export default function AuthForm() {
 						register={register}
 						errors={errors}
 						disabled={isLoading}
+						type="password"
+						required
 					/>
 					<div>
 						<Button disabled={isLoading} fullWidth type="submit">
