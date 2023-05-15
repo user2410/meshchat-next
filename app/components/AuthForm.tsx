@@ -1,20 +1,29 @@
 "use client";
 
 import axios from "axios";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import Input from "./inputs/Input";
 import Button from "./Button";
 import { BsGithub, BsGoogle } from "react-icons/bs";
 import AuthSocialButton from "./AuthSocialButton";
 import { toast } from "react-hot-toast";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 type Variant = "LOGIN" | "REGISTER";
 
 export default function AuthForm() {
+	const session = useSession();
+	const router = useRouter();
 	const [variant, setVariant] = useState<Variant>("LOGIN");
 	const [isLoading, setLoading] = useState<boolean>(false);
+
+	useEffect(() => {
+		if (session?.status === "authenticated") {
+			router.replace("/users");
+		}
+	}, [session?.status, router]);
 
 	const toggleVariant = useCallback(() => {
 		if (variant === "LOGIN") {
@@ -42,6 +51,7 @@ export default function AuthForm() {
 		try {
 			if (variant === "REGISTER") {
 				await axios.post("/api/register", data);
+				signIn("credentials", data);
 			} else {
 				const cb = await signIn("credentials", {
 					...data,
