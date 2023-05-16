@@ -7,14 +7,14 @@ import { signOut } from "next-auth/react";
 
 const useRoute = () => {
 	const pathname = usePathname();
-	const { conversationId } = useConversation();
+	const { convId } = useConversation();
 
 	const routes = useMemo(() => [
 		{
 			label: 'Chat',
-			href: '/convs',
+			href: '/conversations',
 			icon: HiChat,
-			active: pathname === '/convs' || !!conversationId
+			active: pathname === '/conversations' || !!convId
 		},
 		{
 			label: 'Users',
@@ -28,7 +28,7 @@ const useRoute = () => {
 			href: '#',
 			icon: HiArrowLeftOnRectangle,
 		},
-	], [pathname, conversationId]);
+	], [pathname, convId]);
 
 	return routes;
 }
