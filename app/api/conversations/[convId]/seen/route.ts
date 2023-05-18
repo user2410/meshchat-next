@@ -4,7 +4,7 @@ import getCurrentUser from "@/app/actions/getCurrentUser";
 import prisma from "@/app/libs/prisma";
 
 interface IParams {
-	convId?: string;
+	convId: string;
 }
 
 export async function PUT(

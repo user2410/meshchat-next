@@ -3,12 +3,13 @@
 import { FullMessageType } from "@/app/types";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Avatar from "../../Avatar";
 import { format } from "date-fns";
 import Image from "next/image";
 import axios from "axios";
 import useConversation from "@/app/hooks/useConversation";
+import ImageModal from "./ImageModal";
 
 interface MessageBoxProps {
 	data: FullMessageType;
@@ -17,6 +18,7 @@ interface MessageBoxProps {
 
 const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
 	const session = useSession();
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const isOwn = session?.data?.user?.email === data?.sender?.email;
 	const seenList = (data.seen || [])
 		.filter((user) => user.email !== data?.sender?.email)
@@ -47,8 +49,14 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
 						data.image ? "rounded-md p-0" : "rounded-full py-2 px-3"
 					)}
 				>
+					<ImageModal
+						src={data.image}
+						isOpen={isModalOpen}
+						onClose={() => setIsModalOpen(false)}
+					/>
 					{data.image ? (
 						<Image
+							onClick={() => setIsModalOpen(true)}
 							alt="Image message"
 							height="288"
 							width="288"

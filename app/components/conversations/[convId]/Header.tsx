@@ -11,6 +11,7 @@ import useOtherUser from "@/app/hooks/useOtherUser";
 
 import Avatar from "@/app/components/Avatar";
 import AvatarGroup from "@/app/components/AvatarGroup";
+import ProfileDrawer from "./ProfileDrawer";
 // import ProfileDrawer from "./ProfileDrawer";
 
 interface HeaderProps {
@@ -21,7 +22,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ conversation }) => {
 	const otherUser = useOtherUser(conversation);
-	const [drawerOpen, setDrawerOpen] = useState(false);
+	const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
 	// const { members } = useActiveList();
 	// const isActive = members.indexOf(otherUser?.email!) !== -1;
@@ -36,11 +37,11 @@ const Header: React.FC<HeaderProps> = ({ conversation }) => {
 
 	return (
 		<>
-			{/* <ProfileDrawer 
-      data={conversation} 
-      isOpen={drawerOpen} 
-      onClose={() => setDrawerOpen(false)}
-    /> */}
+			<ProfileDrawer
+				data={conversation}
+				isOpen={drawerOpen}
+				onClose={() => setDrawerOpen(false)}
+			/>
 			<div className="bg-white w-full flex border-b-[1px] sm:px-4 py-3 px-4 lg:px-6 justify-between items-center shadow-sm">
 				<div className="flex gap-3 items-center">
 					<Link
