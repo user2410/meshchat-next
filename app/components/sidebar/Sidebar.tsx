@@ -9,7 +9,7 @@ export const Sidebar = async ({ children }: { children: React.ReactNode }) => {
 	return (
 		<div className="h-full">
 			<main className="lg:pl-20 h-full">
-				<DesktopSidebar currentUser={currentUser} />
+				<DesktopSidebar currentUser={currentUser!} />
 				<MobileFooter />
 				{children}
 			</main>
