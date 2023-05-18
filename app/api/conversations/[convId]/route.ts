@@ -1,6 +1,7 @@
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import { NextResponse } from "next/server";
 import prisma from "@/app/libs/prisma";
+import { pusherServer } from "@/app/libs/pusher";
 
 interface Props {
 	convId: string;
@@ -34,6 +35,10 @@ export async function DELETE(req: Request, { params }: { params: Props }) {
 				id: convId,
 			}
 		});
+
+		currentConv.users.forEach(user =>
+			pusherServer.trigger(user.email!, 'conversation:remove', currentConv)
+		)
 
 		return NextResponse.json(deletedConv);
 	} catch (err) {

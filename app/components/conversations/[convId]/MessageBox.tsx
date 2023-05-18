@@ -24,11 +24,6 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
 		.filter((user) => user.email !== data?.sender?.email)
 		.map((user) => user.name)
 		.join(", ");
-	const { convId } = useConversation();
-
-	useEffect(() => {
-		axios.put(`/api/conversations/${convId}/seen`);
-	}, [convId]);
 
 	return (
 		<div className={clsx("flex gap-3 p-4", isOwn && "justify-end")}>

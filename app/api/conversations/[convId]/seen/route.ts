@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import prisma from "@/app/libs/prisma";
+import { pusherServer } from "@/app/libs/pusher";
 
 interface IParams {
 	convId: string;
@@ -13,9 +14,7 @@ export async function PUT(
 ) {
 	try {
 		const currentUser = await getCurrentUser();
-		const {
-			convId
-		} = params;
+		const { convId } = params;
 
 
 		if (!currentUser?.id || !currentUser?.email) {
@@ -67,10 +66,10 @@ export async function PUT(
 		});
 
 		// Update all connections with new seen
-		// await pusherServer.trigger(currentUser.email, 'conversation:update', {
-		//   id: convId,
-		//   messages: [updatedMessage]
-		// });
+		await pusherServer.trigger(currentUser.email, 'conversation:update', {
+			id: convId,
+			messages: [updatedMessage]
+		});
 
 		// If user has already seen the message, no need to go further
 		if (lastMessage.seenIds.indexOf(currentUser.id) !== -1) {
@@ -78,7 +77,7 @@ export async function PUT(
 		}
 
 		// Update last message seen
-		// await pusherServer.trigger(convId!, 'message:update', updatedMessage);
+		await pusherServer.trigger(convId!, 'message:update', updatedMessage);
 
 		return new NextResponse('Success');
 	} catch (error) {
